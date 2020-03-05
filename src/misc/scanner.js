@@ -29,6 +29,7 @@ export function keepScanning(Worker, camera, options) {
   // Make sure to process only one frame at a time.
   let workerBusy = false;
   let shouldContinue = true;
+  let beforeTime = new Date().getTime();
 
   worker.onmessage = event => {
     workerBusy = false;
@@ -41,6 +42,16 @@ export function keepScanning(Worker, camera, options) {
 
     if (location !== locationBefore) {
       locateHandler(location);
+    }
+
+    let curTime = new Date().getTime();
+    if (content === null) {
+      if (curTime - beforeTime > 1500) {
+        contentBefore = null;
+        beforeTime = curTime;
+      }
+    } else {
+      beforeTime = curTime;
     }
 
     contentBefore = content || contentBefore;
